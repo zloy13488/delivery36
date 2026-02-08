@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель логиста</title>
+    <link rel="stylesheet" href="https://unpkg.com/vkui-tokens@2.0.0/themes/vkBase/cssVars/auto.css">
+    <style>
+        :root {
+            --background-gradient: linear-gradient(135deg, #2196F3 0%, #0D47A1 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .vk-app {
+            padding: 16px;
+            min-height: 100vh;
+        }
+        
+        .app-header {
+            background: var(--background-gradient);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-icon {
+            font-size: 32px;
+            background: rgba(255,255,255,0.2);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-text h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header-text p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-total .stat-number { color: #2196F3; }
+        .stat-online .stat-number { color: #4CAF50; }
+        .stat-busy .stat-number { color: #FF9800; }
+        .stat-offline .stat-number { color: #F44336; }
+        
+        .filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .filter-btn {
+            flex-shrink: 0;
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .filter-btn.active {
+            background: #2196F3;
+            border-color: #2196F3;
+            color: white;
+        }
+        
+        .drivers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 80px;
+        }
+        
+        .driver-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .driver-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .driver-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .driver-status {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .status-online {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-busy {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .status-offline {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .driver-body {
+            padding: 16px;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .info-label {
+            width: 100px;
+            color: #666;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            flex: 1;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .driver-footer {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .last-update {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .call-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: none;
+            max-width: 90%;
+        }
+        
+        .notification.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            z-index: 100;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #F44336;
+        }
+        
+        .status-dot.connected {
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="vk-app">
+        <div class="app-header">
+            <div class="header-content">
+                <div class="header-icon">👔</div>
+                <div class="header-text">
+                    <h1>Панель логиста</h1>
+                    <p>Контроль водителей в реальном времени</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card stat-total">
+                <div class="stat-number" id="totalDrivers">0</div>
+                <div class="stat-label">Всего</div>
+            </div>
+            <div class="stat-card stat-online">
+                <div class="stat-number" id="onlineDrivers">0</div>
+                <div class="stat-label">Свободны</div>
+            </div>
+            <div class="stat-card stat-busy">
+                <div class="stat-number" id="busyDrivers">0</div>
+                <div class="stat-label">На заказе</div>
+            </div>
+            <div class="stat-card stat-offline">
+                <div class="stat-number" id="offlineDrivers">0</div>
+                <div class="stat-label">Не на линии</div>
+            </div>
+        </div>
+        
+        <div class="filters" id="filtersContainer">
+            <button class="filter-btn active" onclick="filterDrivers('all')">Все</button>
+            <button class="filter-btn" onclick="filterDrivers('online')">Свободные</button>
+            <button class="filter-btn" onclick="filterDrivers('busy')">На заказе</button>
+            <button class="filter-btn" onclick="filterDrivers('offline')">Не на линии</button>
+        </div>
+        
+        <div class="drivers-list" id="driversContainer">
+            <!-- Карточки водителей -->
+        </div>
+        
+        <button class="refresh-btn" onclick="loadDrivers()">
+            🔄
+        </button>
+        
+        <div id="notification" class="notification"></div>
+        
+        <div class="connection-status" id="connectionStatus">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Подключение...</span>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        let socket;
+        let drivers = [];
+        
+        // Подключение к WebSocket
+        function connectWebSocket() {
+            socket = io(window.location.origin.replace(/^http/, 'ws'));
+            
+            socket.on('connect', () => {
+                console.log('✅ Подключено к серверу');
+                updateConnectionStatus(true);
+                loadDrivers();
+                showNotification('Соединение установлено', 'success');
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('❌ Отключено от сервера');
+                updateConnectionStatus(false);
+                showNotification('Потеряно соединение', 'error');
+            });
+            
+            socket.on('initial_data', (data) => {
+                drivers = data;
+                renderDrivers();
+                updateStats();
+            });
+            
+            socket.on('driver_status_updated', (driver) => {
+                updateDriverInList(driver);
+                updateStats();
+                showNotification(`${driver.name}: ${getStatusText(driver.status)}`);
+            });
+            
+            socket.on('driver_added', (driver) => {
+                showNotification(`Новый водитель: ${driver.name}`);
+                loadDrivers();
+            });
+        }
+        
+        // Загрузка водителей
+        async function loadDrivers() {
+            try {
+                const response = await fetch('/api/drivers');
+                drivers = await response.json();
+                renderDrivers();
+                updateStats();
+                showNotification('Данные обновлены', 'success');
+            } catch (error) {
+                showNotification('Ошибка загрузки', 'error');
+            }
+        }
+        
+        // Рендеринг списка
+        function renderDrivers(filterStatus = 'all') {
+            const container = document.getElementById('driversContainer');
+            
+            const filteredDrivers = filterStatus === 'all' 
+                ? drivers 
+                : drivers.filter(d => d.status === filterStatus);
+            
+            if (filteredDrivers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🚗</div>
+                        <h3>Водителей не найдено</h3>
+                        <p>Нет водителей с выбранным статусом</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredDrivers.map(driver => `
+                <div class="driver-card">
+                    <div class="driver-header">
+                        <div class="driver-name">${driver.name}</div>
+                        <div class="driver-status status-${driver.status}">
+                            ${getStatusText(driver.status)}
+                        </div>
+                    </div>
+                    
+                    <div class="driver-body">
+                        <div class="info-row">
+                            <div class="info-label">Телефон:</div>
+                            <div class="info-value">${driver.phone}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Автомобиль:</div>
+                            <div class="info-value">${driver.carModel}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Гос. номер:</div>
+                            <div class="info-value">
+                                <span style="font-weight: 700; letter-spacing: 1px;">
+                                    ${driver.carNumber}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Местоположение:</div>
+                            <div class="info-value">${driver.lastLocation}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Домашний адрес:</div>
+                            <div class="info-value">${driver.address}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="driver-footer">
+                        <div class="last-update">
+                            ${new Date(driver.lastStatusChange).toLocaleString('ru-RU')}
+                        </div>
+                        <button class="call-btn" onclick="callDriver('${driver.phone}')">
+                            <span>📞</span> Позвонить
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Фильтрация
+        function filterDrivers(status) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderDrivers(status);
+        }
+        
+        // Обновление статистики
+        function updateStats() {
+            const total = drivers.length;
+            const online = drivers.filter(d => d.status === 'online').length;
+            const busy = drivers.filter(d => d.status === 'busy').length;
+            const offline = drivers.filter(d => d.status === 'offline').length;
+            
+            document.getElementById('totalDrivers').textContent = total;
+            document.getElementById('onlineDrivers').textContent = online;
+            document.getElementById('busyDrivers').textContent = busy;
+            document.getElementById('offlineDrivers').textContent = offline;
+        }
+        
+        // Обновление водителя в списке
+        function updateDriverInList(updatedDriver) {
+            const index = drivers.findIndex(d => d.id === updatedDriver.id);
+            if (index !== -1) {
+                drivers[index] = updatedDriver;
+                const activeFilter = document.querySelector('.filter-btn.active');
+                if (activeFilter) {
+                    const filterText = activeFilter.textContent;
+                    let filterStatus = 'all';
+                    if (filterText.includes('Свободные')) filterStatus = 'online';
+                    else if (filterText.includes('заказе')) filterStatus = 'busy';
+                    else if (filterText.includes('линии')) filterStatus = 'offline';
+                    
+                    if (filterStatus === 'all' || updatedDriver.status === filterStatus) {
+                        renderDrivers(filterStatus);
+                    }
+                }
+                updateStats();
+            }
+        }
+        
+        // Вспомогательные функции
+        function getStatusText(status) {
+            const statusMap = {
+                online: '🟢 СВОБОДЕН',
+                busy: '🟡 НА ЗАКАЗЕ',
+                offline: '🔴 НЕ НА ЛИНИИ'
+            };
+            return statusMap[status] || status;
+        }
+        
+        function callDriver(phone) {
+            showNotification(`Звонок: ${phone}`, 'success');
+            // В VK Mini Apps можно использовать:
+            // VKWebAppCallAPIMethod('messages.send', {peer_id: user_id, message: 'Текст'})
+        }
+        
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            
+            if (connected) {
+                dot.className = 'status-dot connected';
+                text.textContent = 'В сети';
+            } else {
+                dot.className = 'status-dot';
+                text.textContent = 'Нет связи';
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type === 'success' ? '' : 'error'}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            connectWebSocket();
+        });
+    </script>
+</body>
+</html>
